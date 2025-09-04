@@ -16,7 +16,7 @@ contract Allowance {
 
     constructor(uint256 _dailyAllowance) {
         parent = msg.sender;
-        dailyAllowanceLimit = _dailyAllowance; // Fixed: was backwards
+        dailyAllowanceLimit = _dailyAllowance;
     }
 
     function depositAllowance() public payable {
@@ -51,7 +51,6 @@ contract Allowance {
         uint256 currentDay = getCurrentDay();
         uint256 todayWithdrawn = dailyWithdrawals[realChild][currentDay];
 
-        // Fixed: Check if new amount would exceed daily limit
         require(
             todayWithdrawn + _amount <= dailyAllowanceLimit,
             "Daily limit exceeded"
@@ -62,7 +61,6 @@ contract Allowance {
         (bool success, ) = realChild.call{value: _amount}("");
         require(success, "Transfer failed");
 
-        // Fixed: Update daily withdrawal tracking
         dailyWithdrawals[realChild][currentDay] += _amount;
 
         emit allowanceWithdrawn(realChild, _amount, block.timestamp);
@@ -76,7 +74,6 @@ contract Allowance {
         uint256 total = 0;
         uint256 currentDay = getCurrentDay();
 
-        // Sum up all withdrawals for the child (you might want to limit this to recent days)
         for (uint256 i = 0; i <= currentDay; i++) {
             total += dailyWithdrawals[realChild][i];
         }
